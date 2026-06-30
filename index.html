@@ -294,23 +294,22 @@
 
   /* メニュー選択 */
   .menu-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .menu-btn {
-    padding: 14px 10px;
+    padding: 16px;
     border: 1.5px solid var(--light);
-    border-radius: 8px;
+    border-radius: 10px;
     background: var(--white);
-    font-size: 13px;
-    color: var(--dark);
     cursor: pointer;
-    text-align: center;
+    text-align: left;
     transition: all 0.2s;
     font-family: 'Noto Sans JP', sans-serif;
-    line-height: 1.4;
+    display: block;
+    width: 100%;
   }
 
   .menu-btn:hover {
@@ -321,8 +320,39 @@
   .menu-btn.selected {
     background: var(--dark);
     border-color: var(--dark);
-    color: var(--white);
+  }
+
+  .menu-name {
+    font-size: 14px;
+    color: var(--dark);
     font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+
+  .menu-btn.selected .menu-name { color: var(--white); }
+
+  .menu-price {
+    font-size: 15px;
+    color: var(--gold);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .menu-btn.selected .menu-price { color: var(--gold-light); }
+
+  .menu-desc {
+    font-size: 11px;
+    color: var(--mid);
+    line-height: 1.6;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--light);
+  }
+
+  .menu-btn.selected .menu-desc {
+    color: rgba(255,255,255,0.65);
+    border-top-color: rgba(255,255,255,0.15);
   }
 
   /* フォーム */
@@ -547,10 +577,31 @@
     <div class="card">
       <div class="card-title">メニューを選択</div>
       <div class="menu-grid">
-        <button class="menu-btn" onclick="selectMenu(this, 'カット')">カット</button>
-        <button class="menu-btn" onclick="selectMenu(this, 'カラー')">カラー</button>
-        <button class="menu-btn" onclick="selectMenu(this, 'カット＋カラー')">カット＋カラー</button>
-        <button class="menu-btn" onclick="selectMenu(this, 'その他')">その他<br><span style="font-size:11px;opacity:0.7">（ご相談ください）</span></button>
+        <button class="menu-btn" onclick="selectMenu(this, 'カット(marbb)込', '¥5,500')">
+          <div class="menu-name">カット (marbb)込</div>
+          <div class="menu-price">¥5,500</div>
+          <div class="menu-desc">※marbbシャンプー・ブロー込</div>
+        </button>
+        <button class="menu-btn" onclick="selectMenu(this, 'カット＋選べる3stepトリートメント＋marbb', '¥7,500')">
+          <div class="menu-name">カット＋選べる3stepトリートメント＋marbb</div>
+          <div class="menu-price">¥7,500</div>
+          <div class="menu-desc">大人気のマイクロバブルと3stepトリートメントが付いたセット。毛穴と髪の汚れを取り除いてからトリートメントをするのでツヤツヤサラサラに。</div>
+        </button>
+        <button class="menu-btn" onclick="selectMenu(this, 'カット＋ケアカラー＋marbb', '¥11,980〜')">
+          <div class="menu-name">カット＋ケアカラー＋marbb</div>
+          <div class="menu-price">¥11,980〜</div>
+          <div class="menu-desc">ファッションカラー ¥11,980／白髪染め ¥11,550〜　※ミディアム＋550円、ロング＋1,100円、コテ仕上げ無料</div>
+        </button>
+        <button class="menu-btn" onclick="selectMenu(this, 'カット＋カラー＋デトックストリートメント', '¥13,000')">
+          <div class="menu-name">カット＋カラー＋デトックストリートメント</div>
+          <div class="menu-price">¥13,000</div>
+          <div class="menu-desc">アルカリ除去・カラー剤の残留物質除去ができるデトックストリートメント。カラー後のかゆみ・乾燥が気になる方に。　※ミディアム＋550円、ロング＋1,100円</div>
+        </button>
+        <button class="menu-btn" onclick="selectMenu(this, 'カット＋縮毛矯正(ストレート)＋marbb', '¥17,700')">
+          <div class="menu-name">カット＋縮毛矯正(ストレート)＋marbb</div>
+          <div class="menu-price">¥17,700</div>
+          <div class="menu-desc">カット＋ストレートパーマにトリートメントが付いたお得なクーポン。　※ミディアム＋1,100円、ロング＋2,200円、髪質改善＋5,500円</div>
+        </button>
       </div>
     </div>
 
@@ -606,12 +657,14 @@
       </div>
     </div>
 
-    <div class="note">
-      ご予約後、サロンよりLINEまたはお電話にてご確認のご連絡をいたします。<br>
-      ご不明な点はお気軽にお問い合わせください。
+    <div class="note" id="copyNote">
+      下のボタンを押すと予約内容がコピーされます。続けて「LINEで送信する」を押し、トーク画面に<strong>貼り付けて送信</strong>してください。
     </div>
 
-    <button class="btn-primary" onclick="submitReservation()">この内容で予約を申し込む</button>
+    <button class="btn-primary" id="btnCopy" onclick="copyAndProceed()">予約内容をコピーする</button>
+    <a href="https://lin.ee/V0QO8jKY" id="btnLineLink" target="_blank" style="text-decoration:none; display:block; pointer-events:none; opacity:0.4;">
+      <button class="btn-primary" id="btnLine" style="background:#06C755; margin-top:10px; pointer-events:none;" disabled>LINEで送信する →</button>
+    </a>
     <button class="btn-secondary" onclick="goBack(3)">← 修正する</button>
   </div>
 
@@ -762,10 +815,11 @@
     renderCalendar();
   }
 
-  function selectMenu(btn, menu) {
+  function selectMenu(btn, menu, price) {
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
     state.selectedMenu = menu;
+    state.selectedPrice = price;
     document.getElementById('btnStep2').disabled = false;
   }
 
@@ -795,7 +849,7 @@
   function goToStep4() {
     const dateStr = getDateString();
     document.getElementById('confirmDateTime').textContent = dateStr;
-    document.getElementById('confirmMenu').textContent = state.selectedMenu;
+    document.getElementById('confirmMenu').textContent = `${state.selectedMenu}（${state.selectedPrice}）`;
     document.getElementById('confirmName').textContent = document.getElementById('inputName').value;
     document.getElementById('confirmPhone').textContent = document.getElementById('inputPhone').value;
     const note = document.getElementById('inputNote').value;
@@ -812,13 +866,52 @@
     updateSteps(toPage);
   }
 
-  function submitReservation() {
-    const dateStr = getDateString();
-    document.getElementById('successDateTime').textContent = dateStr;
+  function buildReservationText() {
+    const note = document.getElementById('inputNote').value.trim();
+    let text = `【ご予約申し込み】\nY's BEE 尾張旭店\n\n`;
+    text += `■日時\n${getDateString()}\n\n`;
+    text += `■メニュー\n${state.selectedMenu}（${state.selectedPrice}）\n\n`;
+    text += `■お名前\n${document.getElementById('inputName').value}\n\n`;
+    text += `■電話番号\n${document.getElementById('inputPhone').value}`;
+    if (note) text += `\n\n■ご要望\n${note}`;
+    return text;
+  }
+
+  async function copyAndProceed() {
+    const text = buildReservationText();
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      // クリップボードAPIが使えない場合の代替手段
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+
+    // コピー完了表示とLINEボタンの有効化
+    const btnCopy = document.getElementById('btnCopy');
+    btnCopy.textContent = '✓ コピーしました';
+    btnCopy.style.background = 'var(--dark)';
+
+    const link = document.getElementById('btnLineLink');
+    const lineBtn = document.getElementById('btnLine');
+    link.style.pointerEvents = 'auto';
+    link.style.opacity = '1';
+    lineBtn.disabled = false;
+    lineBtn.style.pointerEvents = 'auto';
+
+    document.getElementById('copyNote').innerHTML =
+      'コピーしました。続けて<strong>「LINEで送信する」</strong>を押し、トーク画面に貼り付けて送信してください。';
+
+    // 完了画面の内容も準備しておく
+    document.getElementById('successDateTime').textContent = getDateString();
     document.getElementById('successMenu').textContent = state.selectedMenu;
     document.getElementById('successName').textContent = document.getElementById('inputName').value;
-    document.getElementById('stepIndicator').style.display = 'none';
-    showPage('success');
   }
 
   function showPage(id) {
