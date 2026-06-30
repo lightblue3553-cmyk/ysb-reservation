@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Y's BEE 尾張旭店 ご予約</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+
+  :root {
+    --gold: #B8986A;
+    --gold-light: #D4B483;
+    --cream: #FAF8F4;
+    --dark: #2C2420;
+    --mid: #6B5E57;
+    --light: #EDE8E1;
+    --white: #FFFFFF;
+    --error: #C0392B;
+    --success: #5D8A5E;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  header {
+    background: var(--dark);
+    color: var(--white);
+    text-align: center;
+    padding: 24px 16px 20px;
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    margin: 12px auto 0;
+  }
+
+  header h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 300;
+    font-size: 20px;
+    letter-spacing: 0.15em;
+    color: var(--white);
+  }
+
+  header p {
+    font-size: 11px;
+    color: var(--gold-light);
+    letter-spacing: 0.2em;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  /* ステップインジケーター */
+  .steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px 16px;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .step-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--light);
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--mid);
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+
+  .step.active .step-circle {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--white);
+  }
+
+  .step.done .step-circle {
+    background: var(--dark);
+    border-color: var(--dark);
+    color: var(--white);
+  }
+
+  .step-label {
+    font-size: 10px;
+    color: var(--mid);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .step.active .step-label { color: var(--gold); font-weight: 500; }
+  .step.done .step-label { color: var(--dark); }
+
+  .step-line {
+    flex: 1;
+    height: 1px;
+    background: var(--light);
+    margin: 0 6px;
+    margin-bottom: 20px;
+    max-width: 40px;
+  }
+
+  /* カード */
+  .card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 24px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(44,36,32,0.06);
+  }
+
+  .card-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--dark);
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::before {
+    content: '';
+    display: block;
+    width: 3px;
+    height: 14px;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+
+  /* カレンダー */
+  .calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .calendar-nav button {
+    background: none;
+    border: 1px solid var(--light);
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    color: var(--mid);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .calendar-nav button:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .calendar-month {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--dark);
+    letter-spacing: 0.1em;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .calendar-dow {
+    text-align: center;
+    font-size: 10px;
+    color: var(--mid);
+    padding: 4px 0 8px;
+    letter-spacing: 0.05em;
+  }
+
+  .calendar-dow:first-child { color: #C0392B; }
+  .calendar-dow:last-child { color: #2980B9; }
+
+  .calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all 0.2s;
+    color: var(--dark);
+    background: none;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  .calendar-day:hover:not(.disabled):not(.empty) {
+    border-color: var(--gold-light);
+    background: rgba(184,152,106,0.08);
+  }
+
+  .calendar-day.selected {
+    background: var(--gold);
+    color: var(--white);
+    border-color: var(--gold);
+    font-weight: 500;
+  }
+
+  .calendar-day.disabled {
+    color: #CCC;
+    cursor: not-allowed;
+  }
+
+  .calendar-day.today:not(.selected) {
+    border-color: var(--gold-light);
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .calendar-day.empty { cursor: default; }
+  .calendar-day.sunday { color: #C0392B; }
+  .calendar-day.saturday { color: #2980B9; }
+  .calendar-day.selected.sunday,
+  .calendar-day.selected.saturday { color: var(--white); }
+
+  /* 時間選択 */
+  .time-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .time-btn {
+    padding: 12px 8px;
+    border: 1.5px solid var(--light);
+    border-radius: 8px;
+    background: var(--white);
+    font-size: 13px;
+    color: var(--dark);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  .time-btn:hover {
+    border-color: var(--gold-light);
+    background: rgba(184,152,106,0.06);
+  }
+
+  .time-btn.selected {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  /* メニュー選択 */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .menu-btn {
+    padding: 14px 10px;
+    border: 1.5px solid var(--light);
+    border-radius: 8px;
+    background: var(--white);
+    font-size: 13px;
+    color: var(--dark);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+    line-height: 1.4;
+  }
+
+  .menu-btn:hover {
+    border-color: var(--gold-light);
+    background: rgba(184,152,106,0.06);
+  }
+
+  .menu-btn.selected {
+    background: var(--dark);
+    border-color: var(--dark);
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  /* フォーム */
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 12px;
+    color: var(--mid);
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .form-label span {
+    color: var(--gold);
+    margin-left: 4px;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1.5px solid var(--light);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--dark);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+
+  .form-input:focus { border-color: var(--gold); }
+  .form-input::placeholder { color: #C5BDB8; font-size: 14px; }
+
+  /* 確認画面 */
+  .confirm-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--light);
+  }
+
+  .confirm-item:last-child { border-bottom: none; }
+
+  .confirm-label {
+    font-size: 12px;
+    color: var(--mid);
+    letter-spacing: 0.08em;
+  }
+
+  .confirm-value {
+    font-size: 14px;
+    color: var(--dark);
+    font-weight: 500;
+    text-align: right;
+  }
+
+  /* ボタン */
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    background: var(--gold);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+
+  .btn-primary:hover { background: var(--gold-light); }
+  .btn-primary:disabled { background: var(--light); color: var(--mid); cursor: not-allowed; }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 14px;
+    background: none;
+    color: var(--mid);
+    border: 1.5px solid var(--light);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-secondary:hover { border-color: var(--mid); color: var(--dark); }
+
+  /* 完了画面 */
+  .success-screen {
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+  }
+
+  .success-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--dark);
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .success-message {
+    font-size: 13px;
+    color: var(--mid);
+    line-height: 1.8;
+    letter-spacing: 0.05em;
+  }
+
+  .success-detail {
+    background: var(--light);
+    border-radius: 10px;
+    padding: 16px;
+    margin: 20px 0;
+    text-align: left;
+  }
+
+  /* ページ表示制御 */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* 選択済みバッジ */
+  .selected-badge {
+    display: inline-block;
+    background: rgba(184,152,106,0.12);
+    color: var(--gold);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  .note {
+    font-size: 11px;
+    color: var(--mid);
+    line-height: 1.7;
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: var(--cream);
+    border-radius: 8px;
+    letter-spacing: 0.03em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Y's BEE 尾張旭店</h1>
+  <p>Hair Salon Reservation</p>
+</header>
+
+<div class="steps" id="stepIndicator">
+  <div class="step active" id="step1">
+    <div class="step-circle">1</div>
+    <div class="step-label">日時</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step" id="step2">
+    <div class="step-circle">2</div>
+    <div class="step-label">メニュー</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step" id="step3">
+    <div class="step-circle">3</div>
+    <div class="step-label">お客様情報</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step" id="step4">
+    <div class="step-circle">4</div>
+    <div class="step-label">確認</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ページ1: 日時選択 -->
+  <div class="page active" id="page1">
+    <div class="card">
+      <div class="card-title">ご希望の日付</div>
+      <div class="calendar-nav">
+        <button onclick="changeMonth(-1)">&#8249;</button>
+        <span class="calendar-month" id="calendarMonth"></span>
+        <button onclick="changeMonth(1)">&#8250;</button>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <div class="card" id="timeCard" style="display:none">
+      <div class="card-title">ご希望の時間</div>
+      <div class="time-grid" id="timeGrid"></div>
+    </div>
+
+    <button class="btn-primary" id="btnStep1" onclick="goToStep2()" disabled>次へ　メニューを選ぶ →</button>
+  </div>
+
+  <!-- ページ2: メニュー選択 -->
+  <div class="page" id="page2">
+    <div class="card">
+      <div class="card-title">メニューを選択</div>
+      <div class="menu-grid">
+        <button class="menu-btn" onclick="selectMenu(this, 'カット')">カット</button>
+        <button class="menu-btn" onclick="selectMenu(this, 'カラー')">カラー</button>
+        <button class="menu-btn" onclick="selectMenu(this, 'カット＋カラー')">カット＋カラー</button>
+        <button class="menu-btn" onclick="selectMenu(this, 'その他')">その他<br><span style="font-size:11px;opacity:0.7">（ご相談ください）</span></button>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btnStep2" onclick="goToStep3()" disabled>次へ　お客様情報を入力 →</button>
+    <button class="btn-secondary" onclick="goBack(1)">← 日時を選び直す</button>
+  </div>
+
+  <!-- ページ3: お客様情報 -->
+  <div class="page" id="page3">
+    <div class="card">
+      <div class="card-title">お客様情報</div>
+      <div class="form-group">
+        <label class="form-label">お名前<span>必須</span></label>
+        <input class="form-input" type="text" id="inputName" placeholder="山田 花子" oninput="validateStep3()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">電話番号<span>必須</span></label>
+        <input class="form-input" type="tel" id="inputPhone" placeholder="090-0000-0000" oninput="validateStep3()">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">ご要望・ご相談（任意）</label>
+        <textarea class="form-input" id="inputNote" rows="3" placeholder="お気軽にご記入ください" style="resize:none; line-height:1.6"></textarea>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btnStep3" onclick="goToStep4()" disabled>次へ　内容を確認する →</button>
+    <button class="btn-secondary" onclick="goBack(2)">← メニューを選び直す</button>
+  </div>
+
+  <!-- ページ4: 確認 -->
+  <div class="page" id="page4">
+    <div class="card">
+      <div class="card-title">予約内容の確認</div>
+      <div class="confirm-item">
+        <span class="confirm-label">日時</span>
+        <span class="confirm-value" id="confirmDateTime">—</span>
+      </div>
+      <div class="confirm-item">
+        <span class="confirm-label">メニュー</span>
+        <span class="confirm-value" id="confirmMenu">—</span>
+      </div>
+      <div class="confirm-item">
+        <span class="confirm-label">お名前</span>
+        <span class="confirm-value" id="confirmName">—</span>
+      </div>
+      <div class="confirm-item">
+        <span class="confirm-label">電話番号</span>
+        <span class="confirm-value" id="confirmPhone">—</span>
+      </div>
+      <div class="confirm-item" id="confirmNoteRow" style="display:none">
+        <span class="confirm-label">ご要望</span>
+        <span class="confirm-value" id="confirmNote" style="max-width:200px;word-break:break-all">—</span>
+      </div>
+    </div>
+
+    <div class="note">
+      ご予約後、サロンよりLINEまたはお電話にてご確認のご連絡をいたします。<br>
+      ご不明な点はお気軽にお問い合わせください。
+    </div>
+
+    <button class="btn-primary" onclick="submitReservation()">この内容で予約を申し込む</button>
+    <button class="btn-secondary" onclick="goBack(3)">← 修正する</button>
+  </div>
+
+  <!-- 完了画面 -->
+  <div class="page" id="pageSuccess">
+    <div class="card">
+      <div class="success-screen">
+        <div class="success-icon">🌿</div>
+        <div class="success-title">ご予約を受け付けました</div>
+        <div class="success-message">
+          サロンより確認のご連絡を<br>差し上げます。
+        </div>
+        <div class="success-detail">
+          <div class="confirm-item" style="padding:8px 0">
+            <span class="confirm-label">日時</span>
+            <span class="confirm-value" id="successDateTime">—</span>
+          </div>
+          <div class="confirm-item" style="padding:8px 0">
+            <span class="confirm-label">メニュー</span>
+            <span class="confirm-value" id="successMenu">—</span>
+          </div>
+          <div class="confirm-item" style="padding:8px 0;border-bottom:none">
+            <span class="confirm-label">お名前</span>
+            <span class="confirm-value" id="successName">—</span>
+          </div>
+        </div>
+        <div class="success-message" style="font-size:12px">
+          📞 お電話でのお問い合わせ<br>
+          <strong style="color:var(--dark);font-size:14px">サロンの電話番号を入力</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // 状態管理
+  const state = {
+    year: new Date().getFullYear(),
+    month: new Date().getMonth(),
+    selectedDate: null,
+    selectedTime: null,
+    selectedMenu: null,
+  };
+
+  const OPEN_HOURS = [9,10,11,12,13,14,15,16,17]; // 9:00〜17:00（最終枠17:00→18:00終わり）
+  const CLOSED_DAYS = [1, 2]; // 月・火（0=日,1=月,2=火）
+  const DAYS_JA = ['日','月','火','水','木','金','土'];
+  const MONTHS_JA = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+  function init() { renderCalendar(); }
+
+  function renderCalendar() {
+    const { year, month } = state;
+    document.getElementById('calendarMonth').textContent = `${year}年 ${MONTHS_JA[month]}`;
+
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
+
+    // 曜日ヘッダー
+    DAYS_JA.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'calendar-dow';
+      el.textContent = d;
+      grid.appendChild(el);
+    });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    // 空白
+    for (let i = 0; i < firstDay; i++) {
+      const el = document.createElement('button');
+      el.className = 'calendar-day empty';
+      el.disabled = true;
+      grid.appendChild(el);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d);
+      const dow = date.getDay();
+      const isPast = date < today;
+      const isClosed = CLOSED_DAYS.includes(dow);
+      const isDisabled = isPast || isClosed;
+
+      const el = document.createElement('button');
+      el.textContent = d;
+
+      let cls = 'calendar-day';
+      if (dow === 0) cls += ' sunday';
+      if (dow === 6) cls += ' saturday';
+      if (isDisabled) cls += ' disabled';
+
+      const isToday = date.getTime() === today.getTime();
+      if (isToday) cls += ' today';
+
+      if (state.selectedDate &&
+          state.selectedDate.getFullYear() === year &&
+          state.selectedDate.getMonth() === month &&
+          state.selectedDate.getDate() === d) {
+        cls += ' selected';
+      }
+
+      el.className = cls;
+      if (!isDisabled) {
+        el.onclick = () => selectDate(new Date(year, month, d));
+      } else {
+        el.disabled = true;
+      }
+      grid.appendChild(el);
+    }
+  }
+
+  function selectDate(date) {
+    state.selectedDate = date;
+    state.selectedTime = null;
+    renderCalendar();
+    renderTimeSlots();
+    document.getElementById('timeCard').style.display = 'block';
+    document.getElementById('btnStep1').disabled = true;
+  }
+
+  function renderTimeSlots() {
+    const grid = document.getElementById('timeGrid');
+    grid.innerHTML = '';
+    OPEN_HOURS.forEach(h => {
+      const btn = document.createElement('button');
+      btn.className = 'time-btn' + (state.selectedTime === h ? ' selected' : '');
+      btn.textContent = `${String(h).padStart(2,'0')}:00`;
+      btn.onclick = () => selectTime(h);
+      grid.appendChild(btn);
+    });
+  }
+
+  function selectTime(h) {
+    state.selectedTime = h;
+    renderTimeSlots();
+    document.getElementById('btnStep1').disabled = false;
+  }
+
+  function changeMonth(dir) {
+    state.month += dir;
+    if (state.month < 0) { state.month = 11; state.year--; }
+    if (state.month > 11) { state.month = 0; state.year++; }
+    renderCalendar();
+  }
+
+  function selectMenu(btn, menu) {
+    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.selectedMenu = menu;
+    document.getElementById('btnStep2').disabled = false;
+  }
+
+  function validateStep3() {
+    const name = document.getElementById('inputName').value.trim();
+    const phone = document.getElementById('inputPhone').value.trim();
+    document.getElementById('btnStep3').disabled = !(name && phone);
+  }
+
+  function getDateString() {
+    if (!state.selectedDate) return '';
+    const d = state.selectedDate;
+    const dow = DAYS_JA[d.getDay()];
+    return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow}） ${String(state.selectedTime).padStart(2,'0')}:00〜`;
+  }
+
+  function goToStep2() {
+    showPage(2);
+    updateSteps(2);
+  }
+
+  function goToStep3() {
+    showPage(3);
+    updateSteps(3);
+  }
+
+  function goToStep4() {
+    const dateStr = getDateString();
+    document.getElementById('confirmDateTime').textContent = dateStr;
+    document.getElementById('confirmMenu').textContent = state.selectedMenu;
+    document.getElementById('confirmName').textContent = document.getElementById('inputName').value;
+    document.getElementById('confirmPhone').textContent = document.getElementById('inputPhone').value;
+    const note = document.getElementById('inputNote').value;
+    if (note) {
+      document.getElementById('confirmNote').textContent = note;
+      document.getElementById('confirmNoteRow').style.display = 'flex';
+    }
+    showPage(4);
+    updateSteps(4);
+  }
+
+  function goBack(toPage) {
+    showPage(toPage);
+    updateSteps(toPage);
+  }
+
+  function submitReservation() {
+    const dateStr = getDateString();
+    document.getElementById('successDateTime').textContent = dateStr;
+    document.getElementById('successMenu').textContent = state.selectedMenu;
+    document.getElementById('successName').textContent = document.getElementById('inputName').value;
+    document.getElementById('stepIndicator').style.display = 'none';
+    showPage('success');
+  }
+
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id === 'success' ? 'pageSuccess' : `page${id}`).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function updateSteps(active) {
+    for (let i = 1; i <= 4; i++) {
+      const el = document.getElementById(`step${i}`);
+      el.className = 'step' + (i < active ? ' done' : i === active ? ' active' : '');
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
